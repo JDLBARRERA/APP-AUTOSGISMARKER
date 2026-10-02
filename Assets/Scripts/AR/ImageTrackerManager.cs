@@ -13,6 +13,7 @@ namespace ARTrackBuilder.AR
     public class ImageTrackerManager : MonoBehaviour
     {
         private ARTrackedImageManager _trackedImageManager;
+        private TrackingState _lastTrackingState = TrackingState.None;
 
         // Eventos públicos para no acoplar el código (Regla SOLID de nuestro .cursorrules)
         public event Action<ARTrackedImage> OnMatFound;
@@ -39,23 +40,28 @@ namespace ARTrackBuilder.AR
 
         private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
         {
-            // 1. El tapete acaba de entrar en la cámara
             foreach (var trackedImage in eventArgs.added)
             {
+                _lastTrackingState = trackedImage.trackingState;
                 OnMatFound?.Invoke(trackedImage);
                 LogTrackingState(trackedImage);
             }
 
-            // 2. El tapete se está moviendo o la cámara cambia de ángulo
             foreach (var trackedImage in eventArgs.updated)
             {
+                if (trackedImage.trackingState == _lastTrackingState)
+                {
+                    continue;
+                }
+
+                _lastTrackingState = trackedImage.trackingState;
                 OnMatUpdated?.Invoke(trackedImage);
                 LogTrackingState(trackedImage);
             }
 
-            // 3. El tapete salió completamente de la vista
             foreach (var trackedImage in eventArgs.removed)
             {
+                _lastTrackingState = TrackingState.None;
                 OnMatLost?.Invoke(trackedImage);
             }
         }

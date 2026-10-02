@@ -1,63 +1,106 @@
 using UnityEngine;
 using UnityEngine.UI;
+using ARTrackBuilder.AR;
 
 namespace ARTrackBuilder.UI
 {
     /// <summary>
-    /// Gestiona la interfaz principal del usuario: opacidad del holograma y 
-    /// el bloqueo del tracking para dibujar sin que tiemble.
+    /// Ajusta la emisión de la pista instanciada y la fija en coordenadas de mundo sin apagar la sesión AR.
     /// </summary>
     public class TrackUIManager : MonoBehaviour
     {
+        [Header("Dependencias de AR")]
+        [SerializeField] private TrackProjectorManager _projectorManager;
+
         [Header("Controles UI")]
         [SerializeField] private Slider _opacitySlider;
         [SerializeField] private Button _lockButton;
         [SerializeField] private Text _lockButtonText;
 
-        [Header("Dependencias de AR")]
-        [Tooltip("El objeto raíz que contiene la pista proyectada.")]
-        [SerializeField] private CanvasGroup _trackCanvasGroup; // Usado si la pista es UI
-        [SerializeField] private GameObject _arSession; 
-
+        private Transform _originalParent;
         private bool _isLocked = false;
+        private GameObject _opacityTarget;
+        private Color _baseColor;
+        private Color _baseEmission;
+        private bool _hasEmission;
+        private static readonly int EmissionColor = Shader.PropertyToID("_EmissionColor");
 
         private void OnEnable()
         {
             if (_opacitySlider != null)
-                _opacitySlider.onValueChanged.AddListener(UpdateTrackOpacity);
+                _opacitySlider.onValueChanged.AddListener(UpdateOpacity);
 
             if (_lockButton != null)
-                _lockButton.onClick.AddListener(ToggleTrackingLock);
+                _lockButton.onClick.AddListener(ToggleLock);
         }
 
         private void OnDisable()
         {
             if (_opacitySlider != null)
-                _opacitySlider.onValueChanged.RemoveListener(UpdateTrackOpacity);
+                _opacitySlider.onValueChanged.RemoveListener(UpdateOpacity);
 
             if (_lockButton != null)
-                _lockButton.onClick.RemoveListener(ToggleTrackingLock);
+                _lockButton.onClick.RemoveListener(ToggleLock);
         }
 
-        private void UpdateTrackOpacity(float value)
+        private void UpdateOpacity(float value)
         {
-            // Nota: Para objetos 3D reales, se requiere modificar el canal Alpha del material.
-            // Si usamos un Canvas Overlay espacial, esto ajusta la opacidad completa.
-            if (_trackCanvasGroup != null)
+            if (_projectorManager == null || _projectorManager.ActiveTrackInstance == null) return;
+
+            // Modificar la transparencia / emisión directa del Renderer instanciado
+            Renderer renderer = _projectorManager.ActiveTrackInstance.GetComponent<Renderer>();
+            if (renderer == null || renderer.material == null) return;
+
+            CacheBaseColors(renderer);
+
+            Color color = _baseColor;
+            color.a = value;
+            renderer.material.color = color;
+
+            if (_hasEmission)
             {
-                _trackCanvasGroup.alpha = value;
+                renderer.material.SetColor(EmissionColor, _baseEmission * value);
             }
         }
 
-        private void ToggleTrackingLock()
+        private void CacheBaseColors(Renderer renderer)
         {
-            _isLocked = !_isLocked;
-            
-            // Al pausar la sesión AR, el holograma se "congela" en su última posición física.
-            // Ideal para que el niño pueda calcar sin que un mal movimiento de cámara arruine la pista.
-            if (_arSession != null)
+            if (_opacityTarget == _projectorManager.ActiveTrackInstance)
             {
-                _arSession.SetActive(!_isLocked);
+                return;
+            }
+
+            _opacityTarget = _projectorManager.ActiveTrackInstance;
+            _baseColor = renderer.material.color;
+            _hasEmission = renderer.material.HasProperty(EmissionColor);
+            if (_hasEmission)
+            {
+                _baseEmission = renderer.material.GetColor(EmissionColor);
+            }
+        }
+
+        private void ToggleLock()
+        {
+            if (_projectorManager == null || _projectorManager.ActiveTrackInstance == null) return;
+
+            GameObject trackInstance = _projectorManager.ActiveTrackInstance;
+            _isLocked = !_isLocked;
+
+            if (_isLocked)
+            {
+                // Desconectar del Image Target y congelar en coordenadas de mundo
+                _originalParent = trackInstance.transform.parent;
+                trackInstance.transform.SetParent(null, true);
+            }
+            else
+            {
+                // Reconectar al marcador detectado
+                if (_originalParent != null)
+                {
+                    trackInstance.transform.SetParent(_originalParent, false);
+                    trackInstance.transform.localPosition = Vector3.zero;
+                    trackInstance.transform.localRotation = Quaternion.identity;
+                }
             }
 
             if (_lockButtonText != null)

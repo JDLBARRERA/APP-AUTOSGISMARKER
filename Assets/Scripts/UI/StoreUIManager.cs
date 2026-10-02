@@ -4,10 +4,6 @@ using ARTrackBuilder.Data;
 
 namespace ARTrackBuilder.UI
 {
-    /// <summary>
-    /// Gestiona la visualización del escaparate y el proceso de redirigir 
-    /// al usuario a la pasarela de pago web.
-    /// </summary>
     public class StoreUIManager : MonoBehaviour
     {
         [Header("Dependencias")]
@@ -15,8 +11,8 @@ namespace ARTrackBuilder.UI
 
         [Header("Paneles de Interfaz")]
         [SerializeField] private GameObject _storePanel;
-        [SerializeField] private GameObject _productPrefab; // El "cuadrito" del producto en la tienda
-        [SerializeField] private Transform _catalogGridParent; // Donde se instancian los productos
+        [SerializeField] private GameObject _productPrefab;
+        [SerializeField] private Transform _catalogGridParent;
 
         [Header("Controles")]
         [SerializeField] private Button _openStoreButton;
@@ -36,57 +32,69 @@ namespace ARTrackBuilder.UI
 
         private void Start()
         {
-            _storePanel.SetActive(false);
+            if (_storePanel != null) _storePanel.SetActive(false);
             PopulateStorefront();
         }
 
         private void OpenStore()
         {
-            _storePanel.SetActive(true);
+            if (_storePanel != null) _storePanel.SetActive(true);
         }
 
         private void CloseStore()
         {
-            _storePanel.SetActive(false);
+            if (_storePanel != null) _storePanel.SetActive(false);
         }
 
         private void PopulateStorefront()
         {
-            // Limpiar catálogo previo
+            if (_storeData == null || _productPrefab == null || _catalogGridParent == null)
+            {
+                Debug.LogWarning("[StoreUI] Faltan referencias asignadas en el Inspector.");
+                return;
+            }
+
             foreach (Transform child in _catalogGridParent)
             {
                 Destroy(child.gameObject);
             }
 
-            // Crear los botones de compra para cada producto
             foreach (var product in _storeData.GetAllProducts())
             {
                 GameObject productUI = Instantiate(_productPrefab, _catalogGridParent);
-                
-                // Aquí buscaríamos los componentes de texto e imagen del prefab
-                // (Asumiendo que el prefab tiene un script 'ProductCardUI' o lo hacemos directo)
-                Text nameText = productUI.transform.Find("NameText").GetComponent<Text>();
-                Text priceText = productUI.transform.Find("PriceText").GetComponent<Text>();
-                Button buyButton = productUI.transform.Find("BuyButton").GetComponent<Button>();
 
-                nameText.text = product.DisplayName;
-                priceText.text = $"${product.Price:0.00}";
+                // Búsqueda defensiva en componentes hijos
+                Text nameText = FindComponentByName<Text>(productUI, "NameText");
+                Text priceText = FindComponentByName<Text>(productUI, "PriceText");
+                Button buyButton = FindComponentByName<Button>(productUI, "BuyButton");
 
-                // Asignar la acción de compra
-                buyButton.onClick.AddListener(() => GoToCheckout(product.PurchaseURL));
+                if (nameText != null) nameText.text = product.DisplayName;
+                if (priceText != null) priceText.text = $"${product.Price:0.00}";
+
+                if (buyButton != null)
+                {
+                    string targetUrl = product.PurchaseURL;
+                    buyButton.onClick.AddListener(() => GoToCheckout(targetUrl));
+                }
             }
+        }
+
+        private T FindComponentByName<T>(GameObject parent, string childName) where T : Component
+        {
+            Transform child = parent.transform.Find(childName);
+            if (child == null)
+            {
+                Debug.LogError($"[StoreUI] No se encontró el objeto hijo '{childName}' en el prefab de producto.");
+                return null;
+            }
+            return child.GetComponent<T>();
         }
 
         private void GoToCheckout(string url)
         {
             if (!string.IsNullOrEmpty(url))
             {
-                Debug.Log($"[Store] Redirigiendo al navegador seguro: {url}");
-                Application.OpenURL(url); // Abre Safari/Chrome para pagar
-            }
-            else
-            {
-                Debug.LogWarning("[Store] Este producto no tiene un enlace de compra configurado.");
+                Application.OpenURL(url);
             }
         }
     }

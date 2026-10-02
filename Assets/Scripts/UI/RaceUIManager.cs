@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using ARTrackBuilder.AR;
 using ARTrackBuilder.Data;
 
 namespace ARTrackBuilder.UI
@@ -13,6 +14,8 @@ namespace ARTrackBuilder.UI
     {
         [Header("Dependencias")]
         [SerializeField] private RaceHistoryManager _historyManager;
+        [SerializeField] private TrackProjectorManager _projector;
+        [SerializeField] private RaceDashboardUIManager _dashboard;
 
         [Header("Paneles de UI")]
         [SerializeField] private GameObject _registrationPanel;
@@ -30,7 +33,7 @@ namespace ARTrackBuilder.UI
         [SerializeField] private Button _saveResultButton;
 
         private List<Competitor> _currentParticipants = new List<Competitor>();
-        private string _currentTrackName = "Circuito Asfalto AR"; // En el futuro se conectará al TrackDataManager
+        private string _currentTrackName = "Circuito Asfalto AR";
 
         private void OnEnable()
         {
@@ -107,6 +110,10 @@ namespace ARTrackBuilder.UI
                 participantNames.Add(p.PlayerName);
             }
             _winnerDropdown.AddOptions(participantNames);
+            if (_dashboard != null)
+            {
+                _dashboard.SetPlayers(participantNames.ToArray());
+            }
 
             // Mostrar el botón de podio (simularemos que aparece cuando terminan de jugar)
             _podiumPanel.SetActive(true);
@@ -117,7 +124,8 @@ namespace ARTrackBuilder.UI
             if (_historyManager != null && _currentParticipants.Count > 0)
             {
                 string winnerName = _winnerDropdown.options[_winnerDropdown.value].text;
-                _historyManager.AddRaceResult(_currentTrackName, _currentParticipants, winnerName);
+                string trackName = _projector != null ? _projector.ActiveTrackName : _currentTrackName;
+                _historyManager.AddRaceResult(trackName, _currentParticipants, winnerName);
                 
                 // Reiniciar para una nueva carrera
                 _currentParticipants.Clear();

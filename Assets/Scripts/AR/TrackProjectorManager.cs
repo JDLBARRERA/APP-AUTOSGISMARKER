@@ -1,18 +1,22 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
-using ARTrackBuilder.Core;
 using ARTrackBuilder.Data;
 
 namespace ARTrackBuilder.AR
 {
+    /// <summary>
+    /// Instancia la pista sobre el tapete rastreado y publica la instancia y el nombre activos.
+    /// </summary>
     public class TrackProjectorManager : MonoBehaviour
     {
         [Header("Dependencias")]
         [SerializeField] private ImageTrackerManager _imageTracker;
         [SerializeField] private TrackDataManager _trackData;
 
-        private GameObject _activeTrackInstance;
+        public GameObject ActiveTrackInstance { get; private set; }
+        public string ActiveTrackName { get; private set; } = "Circuito Neón Alfa";
+
         private GameObject _currentPrefabToInstantiate;
         private ARTrackedImage _currentTrackedImage;
 
@@ -49,108 +53,109 @@ namespace ARTrackBuilder.AR
         private void HandleTrackChange(GameObject newTrackPrefab)
         {
             _currentPrefabToInstantiate = newTrackPrefab;
+            if (newTrackPrefab != null) ActiveTrackName = newTrackPrefab.name;
 
-            // Si ya hay una pista proyectada en el tapete, la destruimos e instanciamos la nueva
-            if (_activeTrackInstance != null && _currentTrackedImage != null)
+            if (ActiveTrackInstance != null)
             {
-                Destroy(_activeTrackInstance);
-                _activeTrackInstance = SpawnTrack(_currentTrackedImage.transform);
+                Destroy(ActiveTrackInstance);
+                ActiveTrackInstance = null;
+            }
+
+            if (_currentTrackedImage != null && _currentTrackedImage.trackingState == TrackingState.Tracking)
+            {
+                InstantiateTrack();
             }
         }
 
         private void HandleMatFound(ARTrackedImage trackedImage)
         {
             _currentTrackedImage = trackedImage;
-
-            if (_activeTrackInstance == null && _currentPrefabToInstantiate != null)
+            if (ActiveTrackInstance == null)
             {
-                _activeTrackInstance = SpawnTrack(trackedImage.transform);
+                InstantiateTrack();
             }
-            else if (_activeTrackInstance != null)
+            else
             {
-                _activeTrackInstance.SetActive(true);
+                ActiveTrackInstance.SetActive(true);
             }
         }
 
         private void HandleMatUpdated(ARTrackedImage trackedImage)
         {
-            if (_activeTrackInstance == null) return;
-
-            if (trackedImage.trackingState == TrackingState.Limited)
+            _currentTrackedImage = trackedImage;
+            if (ActiveTrackInstance == null && trackedImage.trackingState == TrackingState.Tracking)
             {
-                _activeTrackInstance.SetActive(false);
-            }
-            else if (trackedImage.trackingState == TrackingState.Tracking && !_activeTrackInstance.activeSelf)
-            {
-                _activeTrackInstance.SetActive(true);
-            }
-        }
-
-        private GameObject SpawnTrack(Transform parent)
-        {
-            var instance = Instantiate(_currentPrefabToInstantiate, parent);
-            instance.transform.localScale = TrackPhysicalSpec.PREFAB_SCALE;
-            WarnIfOutsideMat(instance);
-            return instance;
-        }
-
-        private static void WarnIfOutsideMat(GameObject instance)
-        {
-            var filters = instance.GetComponentsInChildren<MeshFilter>(true);
-            var hasBounds = false;
-            var bounds = new Bounds(Vector3.zero, Vector3.zero);
-
-            for (var i = 0; i < filters.Length; i++)
-            {
-                var mesh = filters[i].sharedMesh;
-                if (mesh == null)
-                {
-                    continue;
-                }
-
-                var meshBounds = mesh.bounds;
-                var center = meshBounds.center;
-                var extents = meshBounds.extents;
-                for (var x = -1; x <= 1; x += 2)
-                {
-                    for (var y = -1; y <= 1; y += 2)
-                    {
-                        for (var z = -1; z <= 1; z += 2)
-                        {
-                            var corner = center + Vector3.Scale(extents, new Vector3(x, y, z));
-                            var local = instance.transform.InverseTransformPoint(filters[i].transform.TransformPoint(corner));
-                            if (!hasBounds)
-                            {
-                                bounds = new Bounds(local, Vector3.zero);
-                                hasBounds = true;
-                            }
-                            else
-                            {
-                                bounds.Encapsulate(local);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!hasBounds)
-            {
+                InstantiateTrack();
                 return;
             }
 
-            var maxSize = TrackPhysicalSpec.TRACK_BOUNDS_MAX_METERS;
-            if (bounds.size.x > maxSize || bounds.size.z > maxSize)
+            if (ActiveTrackInstance != null)
             {
-                Debug.LogWarning($"[AR] La pista supera el tapete ({bounds.size.x:0.00} x {bounds.size.z:0.00} m). El máximo es {maxSize:0.00} m.");
+                ActiveTrackInstance.SetActive(trackedImage.trackingState == TrackingState.Tracking);
             }
         }
 
         private void HandleMatLost(ARTrackedImage trackedImage)
         {
             _currentTrackedImage = null;
-            if (_activeTrackInstance != null)
+            if (ActiveTrackInstance != null)
             {
-                _activeTrackInstance.SetActive(false);
+                ActiveTrackInstance.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// Publica la pista creada por el simulador local para que la opacidad y el bloqueo actúen sobre ella.
+        /// </summary>
+        public void RegisterSimulatedTrack(GameObject track)
+        {
+            ActiveTrackInstance = track;
+            if (track != null)
+            {
+                ActiveTrackName = track.name;
+            }
+        }
+
+        /// <summary>
+        /// Instancia la pista en el origen del mundo, sin imagen rastreada. Lo llama el botón de prueba del Canvas.
+        /// </summary>
+        public void SimulateMatFound()
+        {
+            if (_currentPrefabToInstantiate == null)
+            {
+                Debug.LogWarning("[AR] No hay un prefab de pista. Asigna Prefab_NeonTrack_01 en TrackDataManager.");
+                return;
+            }
+
+            if (ActiveTrackInstance == null)
+            {
+                ActiveTrackInstance = Instantiate(_currentPrefabToInstantiate);
+                ActiveTrackInstance.transform.position = Vector3.zero;
+                ActiveTrackInstance.transform.rotation = Quaternion.identity;
+            }
+
+            ActiveTrackInstance.SetActive(true);
+        }
+
+        /// <summary>
+        /// Oculta la pista de prueba. Lo llama el botón de tapete perdido.
+        /// </summary>
+        public void SimulateMatLost()
+        {
+            if (ActiveTrackInstance != null)
+            {
+                ActiveTrackInstance.SetActive(false);
+            }
+        }
+
+        private void InstantiateTrack()
+        {
+            if (_currentPrefabToInstantiate != null && _currentTrackedImage != null)
+            {
+                ActiveTrackInstance = Instantiate(_currentPrefabToInstantiate, _currentTrackedImage.transform);
+                ActiveTrackInstance.transform.localPosition = Vector3.zero;
+                ActiveTrackInstance.transform.localRotation = Quaternion.identity;
+                ActiveTrackInstance.SetActive(true);
             }
         }
     }
