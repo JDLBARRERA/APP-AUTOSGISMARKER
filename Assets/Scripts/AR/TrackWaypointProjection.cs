@@ -67,7 +67,7 @@ namespace ARTrackBuilder.AR
                 gameObject.AddComponent<LandscapeGround>();
             }
 
-            if (FindObjectOfType<LandscapeUIManager>() == null)
+            if (FindObjectOfType<LandscapeUIManager>(true) == null)
             {
                 gameObject.AddComponent<LandscapeUIManager>();
             }
@@ -87,7 +87,7 @@ namespace ARTrackBuilder.AR
                 gameObject.AddComponent<VoiceCommentator>();
             }
 
-            if (FindObjectOfType<SlotBroadcastUI>() == null)
+            if (FindObjectOfType<SlotBroadcastUI>(true) == null)
             {
                 gameObject.AddComponent<SlotBroadcastUI>();
             }
@@ -287,6 +287,7 @@ namespace ARTrackBuilder.AR
                 case WaypointRule.TensionTrap: return "Trampa";
                 case WaypointRule.Lava: return "Lava";
                 case WaypointRule.Ice: return "Hielo";
+                case WaypointRule.Rain: return "Lluvia";
                 default: return "Punto";
             }
         }
@@ -302,6 +303,7 @@ namespace ARTrackBuilder.AR
                 case WaypointRule.TensionTrap: return "TRAMPA " + Mathf.Clamp(waypoint.RuleValue, 1, 3);
                 case WaypointRule.Lava: return "LAVA";
                 case WaypointRule.Ice: return "HIELO";
+                case WaypointRule.Rain: return "LLUVIA";
                 default: return string.Empty;
             }
         }
@@ -317,6 +319,7 @@ namespace ARTrackBuilder.AR
                 case WaypointRule.TensionTrap: return new Color(0.75f, 0.15f, 1f);
                 case WaypointRule.Lava: return new Color(1f, 0.35f, 0.05f);
                 case WaypointRule.Ice: return new Color(0.55f, 0.9f, 1f);
+                case WaypointRule.Rain: return new Color(0.12f, 0.32f, 0.85f);
                 default: return new Color(0.2f, 0.9f, 1f);
             }
         }

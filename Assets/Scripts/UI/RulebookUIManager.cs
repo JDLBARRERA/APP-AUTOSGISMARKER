@@ -25,14 +25,15 @@ namespace ARTrackBuilder.UI
             "El Foso: Zona prohibida proyectada sobre la pista. El auto no puede caer dentro. Si cae en el foso, pierde el turno siguiente.\n\n" +
             "Zonas de Turbo AR: Si al terminar tu turno tu auto queda estacionado sobre una flecha verde holográfica proyectada por la app, ganas un \"Boost\". Tu siguiente turno tendrá 4 tiros en lugar de 3.\n\n" +
             "Zonas de Peligro AR: Si la app proyecta lava o hielo y tu auto se detiene ahí, tu vehículo sufre daño. En tu siguiente turno, es obligatorio tirar usando tu mano no dominante.\n\n" +
+            "Tramo de lluvia: Si el auto está en el tramo de lluvia marcado en la pista, ese turno solo tiene un tiro. El siguiente turno vuelve a tres, salvo que ese auto siga en el tramo y se marque de nuevo. La luz de lluvia de toda la mesa no cuenta.\n\n" +
             "El Árbitro de Cámara (VAR): Ante cualquier disputa sobre si un auto tocó la línea de gis o al cruzar la meta, los jugadores usarán la cámara de la app. El sistema AR dictará un veredicto imparcial sobre la posición.\n\n" +
             "IV. Formatos de Carrera\n\n" +
-            "CIRCUITO: 1 vuelta en el circuito corto. Incluye un tiro exacto, una trampa de 1 tiro, un foso, un tiro largo y hielo. Sirve para correr el reglamento completo en poco tiempo.\n\n" +
-            "GRAN CIRCUITO: 2 vueltas. Incluye dos tiros exactos, una trampa de 2 tiros, un foso, un tiro largo y lava.\n\n" +
-            "GRAND PRIX: 3 vueltas. Incluye dos tiros exactos, trampas de 1, 2 y 3 tiros, dos fosos, dos tiros largos, lava y hielo.\n\n" +
+            "CIRCUITO: 1 vuelta en el circuito corto. Incluye un tiro exacto, una trampa de 1 tiro, un foso, un tiro largo, hielo y un tramo de lluvia. Sirve para correr el reglamento completo en poco tiempo.\n\n" +
+            "GRAN CIRCUITO: 2 vueltas. Incluye dos tiros exactos, una trampa de 2 tiros, un foso, un tiro largo, lava y un tramo de lluvia.\n\n" +
+            "GRAND PRIX: 3 vueltas. Incluye dos tiros exactos, trampas de 1, 2 y 3 tiros, dos fosos, dos tiros largos, lava, hielo y un tramo de lluvia.\n\n" +
             "En los tres formatos siguen vigentes los 3 tiros por turno, el orden de salida, el fuera de gis, el pivote, el tráfico, el takedown, el rebufo y el VAR.\n\n" +
             "V. Proyector y paisaje\n\n" +
-            "El proyector tira la pista en color para trazarla con gis. El paisaje sigue el relieve del piso: plano es asfalto, pendiente es desierto, escalones es nieve y un piso rugoso es bosque. También se puede fijar a mano lluvia, hielo, nieve, lava, desierto, bosque o noche. Esas luces no cambian el reglamento: la lava y el hielo del circuito siguen siendo las zonas de la pista.";
+            "El proyector tira la pista en color para trazarla con gis. El paisaje sigue el relieve del piso: plano es asfalto, pendiente es desierto, escalones es nieve y un piso rugoso es bosque. También se puede fijar a mano lluvia, hielo, nieve, lava, desierto, bosque o noche. Esas luces no cambian el reglamento: la lava, el hielo y el tramo de lluvia siguen siendo las zonas marcadas en la pista.";
 
         [Header("Paneles de Interfaz")]
         [SerializeField] private GameObject _rulebookPanel;

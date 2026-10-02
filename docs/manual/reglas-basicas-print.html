@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reglas básicas</title>
+<style>
+  @page { size: A4; margin: 16mm 16mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: #111;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 12pt;
+    line-height: 1.45;
+  }
+  h1 {
+    font-family: "Segoe UI", sans-serif;
+    font-weight: 600;
+    font-size: 22pt;
+    margin: 0 0 0.4em;
+  }
+  h2 {
+    font-family: "Segoe UI", sans-serif;
+    font-weight: 600;
+    font-size: 14pt;
+    margin: 1.3em 0 0.4em;
+    page-break-after: avoid;
+  }
+  p { margin: 0 0 0.7em; }
+  strong { font-weight: 700; }
+  figure { margin: 0.5em 0 0.9em; text-align: center; page-break-inside: avoid; }
+  img { width: 100%; max-width: 360px; height: auto; }
+  figcaption {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 9pt;
+    letter-spacing: 0.04em;
+    color: #444;
+    margin-top: 0.3em;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 0.6em 0 1em; page-break-inside: avoid; font-size: 11pt; }
+  th, td { text-align: left; vertical-align: top; border-bottom: 1px solid #111; padding: 0.35em 0.5em 0.35em 0; }
+  th { font-family: "Segoe UI", sans-serif; font-weight: 600; }
+</style>
+</head>
+<body>
+  <h1>Reglas básicas</h1>
+  <p>Se juega en la mesa, con carritos de verdad y una pista de gis. Las reglas las cuidan los que están jugando. Si hay duda, se mira el carrito.</p>
+  <figure>
+    <img src="tiro.jpg" alt="Tres tiros con el índice">
+    <figcaption>Tres tiros con el índice</figcaption>
+  </figure>
+
+  <h2>La salida</h2>
+  <p>Juegan de dos a diez. Cada quien corre con su carrito.</p>
+  <p>El primero de la lista sale adelante y tira primero. Mientras siga adelante, él abre cada vuelta de turnos.</p>
+  <p>Cuando ya tiraron todos, se mira la pista. Tira primero el que va adelante, luego el segundo, luego el tercero y el resto. Si alguien rebasa, no se grita nada. Ya se sabe que ese va primero en la vuelta de turnos que sigue. No se mete en el turno que ya iba.</p>
+  <figure>
+    <img src="primero.jpg" alt="El líder conserva el primer tiro">
+    <figcaption>El líder conserva el primer tiro</figcaption>
+  </figure>
+
+  <h2>El tiro</h2>
+  <p>El carrito solo camina con un capirotazo del dedo índice, un toque rápido. No se empuja, no se arrastra y no se acompaña con la mano. Si la mano se queda pegada, ese tiro no cuenta.</p>
+  <p>Cada turno tiene tres tiros. Cuando se acaban, le toca al que sigue.</p>
+  <p>No hace falta usar los tres. Los que no tires no se guardan para después.</p>
+  <p>Para acomodar el carrito, solo se gira sobre su propio eje, con una llanta pegada a la mesa. Si lo levantas completo, se anula el turno.</p>
+
+  <h2>La línea</h2>
+  <p>La pista es la cinta de gis. Tocar la orilla no saca al carrito: mientras siga sobre el gis, ese tiro se quedó.</p>
+  <p>Cada tiro que se queda deja el carrito ahí, y de ahí sale el siguiente. Tiras el primero. Si se queda, de ahí tiras el segundo. Si el segundo también se queda, de ahí tiras el tercero. Si los tres se quedan, el carrito se queda donde cayó el tercero.</p>
+  <p>Si un tiro se sale por completo y ya no toca la línea, ese tiro no avanza. El carrito regresa a donde hiciste ese tiro. Si el primero se queda, el segundo se queda y el tercero se sale, el carrito se queda donde hiciste el tercer tiro: el lugar que dejó el segundo. No regresa al inicio del turno.</p>
+
+  <h2>Las zonas</h2>
+  <p>Las zonas se dibujan en la pista. Solo valen las que esa carrera traiga marcadas. Si no está dibujada, esa regla no se usa.</p>
+  <figure>
+    <img src="foso.jpg" alt="El foso corta la línea">
+    <figcaption>El foso corta la línea</figcaption>
+  </figure>
+  <p><strong>Tiro exacto.</strong> El carrito se detiene en la casilla y ahí se queda. Si todavía le quedan tiros, puede seguir desde ese punto. No es castigo: clavó la casilla.</p>
+  <p><strong>Tiro largo.</strong> Si el turno se acaba sobre la flecha, el siguiente turno de ese jugador trae cuatro tiros, no tres.</p>
+  <p><strong>Trampa.</strong> Ese tramo se cruza en los tiros que dice la marca: uno, dos o tres. Si el carrito se queda adentro cuando se acaban esos tiros, regresa al inicio de esa sección. No es lo mismo que el foso: el foso te quita el turno que sigue; la trampa te regresa en el mismo tramo.</p>
+  <p><strong>Foso.</strong> Es un hueco prohibido. No se puede caer. Si caes, el turno en el que caíste ya se jugó, pero el que sigue se pierde: pasas.</p>
+  <p><strong>Lava y hielo.</strong> Si te detienes en esa marca, el turno que sigue lo tiras con la mano con la que no escribes.</p>
+  <p><strong>Lluvia.</strong> Mientras el carrito esté en ese tramo, ese turno solo tiene un tiro. En el que sigue vuelven los tres, salvo que siga en la lluvia y se marque otra vez.</p>
+  <p><strong>Tráfico.</strong> Si dos carritos quedan pegados, un tiro de esa ronda solo sirve para separarlos. El del rival no se mueve.</p>
+  <p><strong>Choque.</strong> Si con un tiro sacas al rival fuera del gis, él pierde el primer tiro de su siguiente turno. Tu carrito se queda donde quedó después del golpe.</p>
+  <p><strong>Rebufo.</strong> Si dejas tu carrito justo atrás del rival, a menos de dos centímetros y sin tocarlo, tu siguiente turno gana un tiro de más. Vas en su rebufo.</p>
+  <p>Si se pelean por la línea o por la meta, se mira el carrito en la mesa. Lo que se ve, vale.</p>
+
+  <h2>Las carreras</h2>
+  <table>
+    <thead><tr><th>Carrera</th><th>Vueltas</th><th>Qué lleva</th></tr></thead>
+    <tbody>
+      <tr><td>CIRCUITO</td><td>1</td><td>Un tiro exacto, una trampa de un tiro, un foso, un tiro largo, hielo y lluvia</td></tr>
+      <tr><td>GRAN CIRCUITO</td><td>2</td><td>Dos tiros exactos, una trampa de dos tiros, un foso, un tiro largo, lava y lluvia</td></tr>
+      <tr><td>GRAND PRIX</td><td>3</td><td>Dos tiros exactos, trampas de uno, dos y tres tiros, dos fosos, dos tiros largos, lava, hielo y lluvia</td></tr>
+    </tbody>
+  </table>
+  <p>En las tres valen las mismas reglas de siempre: tres tiros, quién tira primero, la línea, el giro, el tráfico, el choque y el rebufo.</p>
+  <p>Los dibujos de pista son Óvalo, Ocho, Recta, Manzanas y Campeonato. Cada uno se corre diez veces y luego sigue el que viene, en la misma dificultad.</p>
+</body>
+</html>

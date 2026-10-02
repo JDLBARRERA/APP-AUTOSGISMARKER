@@ -133,6 +133,7 @@ namespace ARTrackBuilder.UI
             if (NextPlayerText) NextPlayerText.text = "SIGUIENTE: " + _throwOrder.Next + "  ·  1º " + _throwOrder.Leader;
 
             bool turnLost = RaceTurnController.Instance != null && RaceTurnController.Instance.CurrentTurnLost;
+            int limit = RaceTurnController.Instance != null ? RaceTurnController.Instance.ShotLimit : 3;
             if (ShotCards != null)
             {
                 for (int i = 0; i < ShotCards.Length; i++)
@@ -142,7 +143,12 @@ namespace ARTrackBuilder.UI
                         continue;
                     }
 
-                    if (turnLost || i > currentShot - 1)
+                    if (i >= limit)
+                    {
+                        ShotCards[i].color = new Color(0.15f, 0.15f, 0.15f, 0.35f);
+                        SetCardStatus(i, string.Empty);
+                    }
+                    else if (turnLost || i > currentShot - 1)
                     {
                         ShotCards[i].color = Color.white;
                         SetCardStatus(i, "PENDIENTE");
@@ -171,7 +177,6 @@ namespace ARTrackBuilder.UI
                 return;
             }
 
-            int limit = RaceTurnController.Instance != null ? RaceTurnController.Instance.ShotLimit : 3;
             ActionButtonText.text = $"¡YA TIRÉ! (TIRO {currentShot} DE {limit})";
         }
 
@@ -277,6 +282,7 @@ namespace ARTrackBuilder.UI
             bool longShot = false;
             bool lava = false;
             bool ice = false;
+            bool rain = false;
             bool trap1 = false;
             bool trap2 = false;
             bool trap3 = false;
@@ -290,6 +296,7 @@ namespace ARTrackBuilder.UI
                     else if (point.Rule == WaypointRule.LongShot) longShot = true;
                     else if (point.Rule == WaypointRule.Lava) lava = true;
                     else if (point.Rule == WaypointRule.Ice) ice = true;
+                    else if (point.Rule == WaypointRule.Rain) rain = true;
                     else if (point.Rule == WaypointRule.TensionTrap)
                     {
                         int shots = Mathf.Clamp(point.RuleValue, 1, 3);
@@ -308,6 +315,7 @@ namespace ARTrackBuilder.UI
             if (trap3) AddRuleButton("TRAMPA 3", () => ConfirmTrap(3));
             if (lava) AddRuleButton("LAVA", () => ConfirmDanger(true));
             if (ice) AddRuleButton("HIELO", () => ConfirmDanger(false));
+            if (rain) AddRuleButton("LLUVIA", ConfirmRain);
             AddRuleButton("VA PRIMERO", DeclareLeader);
             AddRuleButton("TRÁFICO", ConfirmTraffic);
             AddRuleButton("TAKEDOWN", ConfirmTakedown);
@@ -337,6 +345,11 @@ namespace ARTrackBuilder.UI
         private void ConfirmDanger(bool lava)
         {
             if (RaceTurnController.Instance) RaceTurnController.Instance.ApplyDanger(lava);
+        }
+
+        private void ConfirmRain()
+        {
+            if (RaceTurnController.Instance) RaceTurnController.Instance.ApplyRain();
         }
 
         private void ConfirmTraffic()

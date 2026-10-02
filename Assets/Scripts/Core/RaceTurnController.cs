@@ -90,6 +90,17 @@ namespace ARTrackBuilder.Core
         }
 
         /// <summary>
+        /// El auto está en el tramo de lluvia: este turno solo tiene un tiro.
+        /// El siguiente turno recupera su límite, salvo que ese auto también se marque en la lluvia.
+        /// </summary>
+        public void ApplyRain()
+        {
+            _shotLimit = 1;
+            OnRuleAlertTriggered?.Invoke("LLUVIA: en este tramo solo vale un tiro.");
+            OnShotChanged?.Invoke(CurrentShot);
+        }
+
+        /// <summary>
         /// Lava o hielo: el siguiente turno se tira con la mano no dominante.
         /// </summary>
         public void ApplyDanger(bool lava)

@@ -18,7 +18,8 @@ namespace ARTrackBuilder.Data
         LongShot,
         TensionTrap,
         Lava,
-        Ice
+        Ice,
+        Rain
     }
 
     /// <summary>

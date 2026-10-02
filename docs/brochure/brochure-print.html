@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Phygital Racing Pack</title>
+<style>
+  @page { size: 11in 8.5in; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #07080b; }
+  body {
+    color: #f4f7f2;
+    font-family: "Segoe UI", sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .sheet {
+    width: 11in;
+    height: 8.5in;
+    display: flex;
+    page-break-after: always;
+    overflow: hidden;
+  }
+  .sheet:last-child { page-break-after: auto; }
+  .panel {
+    position: relative;
+    width: 3.6667in;
+    height: 8.5in;
+    overflow: hidden;
+    background: #0b0d11 center / cover no-repeat;
+  }
+  .panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(57,255,80,0.18), transparent 42%),
+      linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.78) 100%);
+    pointer-events: none;
+  }
+  .cover { background-image: url("mesa.jpg"); }
+  .holo { background-image: url("holograma.jpg"); }
+  .pack { background-image: url("pack.jpg"); }
+  .back {
+    background:
+      radial-gradient(circle at 50% 42%, rgba(57,255,80,0.16), transparent 36%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 7px),
+      #07080b;
+  }
+  .flap {
+    background:
+      radial-gradient(circle at 70% 80%, rgba(57,255,80,0.35), transparent 28%),
+      radial-gradient(circle at 20% 20%, rgba(0,220,255,0.18), transparent 32%),
+      repeating-linear-gradient(100deg, transparent 0 18px, rgba(57,255,80,0.08) 18px 20px),
+      #090b10;
+  }
+  .copy {
+    position: absolute;
+    left: 0.28in;
+    right: 0.28in;
+    bottom: 0.32in;
+    z-index: 1;
+  }
+  h1 {
+    margin: 0 0 0.12in;
+    font-family: Impact, "Arial Black", sans-serif;
+    font-weight: 400;
+    font-size: 34pt;
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    text-shadow: 0 0 18px rgba(57,255,80,0.45);
+  }
+  .sub {
+    margin: 0;
+    font-size: 12pt;
+    line-height: 1.25;
+    color: #d7ffe0;
+  }
+  .center-line {
+    position: absolute;
+    left: 0.28in;
+    right: 0.28in;
+    bottom: 0.42in;
+    z-index: 1;
+    margin: 0;
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 32pt;
+    line-height: 0.9;
+    text-transform: uppercase;
+    text-shadow: 0 0 18px rgba(57,255,80,0.55);
+  }
+  .flap-name {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4in;
+    text-align: center;
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 28pt;
+    line-height: 0.95;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-shadow: 0 0 22px rgba(57,255,80,0.7);
+  }
+  ul { margin: 0.16in 0 0; padding: 0; list-style: none; }
+  li {
+    display: flex;
+    gap: 0.12in;
+    align-items: flex-start;
+    margin: 0.12in 0;
+    font-size: 11pt;
+    line-height: 1.2;
+  }
+  .icon {
+    flex: 0 0 0.38in;
+    width: 0.38in;
+    height: 0.38in;
+    border-radius: 50%;
+    border: 2px solid #39ff50;
+    box-shadow: 0 0 12px rgba(57,255,80,0.8);
+    color: #39ff50;
+    font-family: Impact, sans-serif;
+    font-size: 13pt;
+    line-height: 0.34in;
+    text-align: center;
+  }
+  .pack li::before {
+    content: "";
+    flex: 0 0 0.12in;
+    width: 0.12in;
+    height: 0.12in;
+    margin-top: 0.06in;
+    border-radius: 50%;
+    background: #39ff50;
+    box-shadow: 0 0 10px #39ff50;
+  }
+  .back .copy { top: 0.38in; bottom: auto; text-align: center; }
+  .qr-wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 2.15in;
+    z-index: 1;
+    text-align: center;
+  }
+  .qr-wrap img {
+    width: 2.15in;
+    height: 2.15in;
+    background: #fff;
+    padding: 0.08in;
+    box-shadow: 0 0 28px rgba(57,255,80,0.85), 0 0 60px rgba(57,255,80,0.35);
+  }
+  .contact {
+    position: absolute;
+    left: 0.22in;
+    right: 0.22in;
+    bottom: 0.32in;
+    z-index: 1;
+    margin: 0;
+    text-align: center;
+    font-size: 11pt;
+    letter-spacing: 0.02em;
+    color: #b7ffc4;
+  }
+</style>
+</head>
+<body>
+  <section class="sheet">
+    <article class="panel back">
+      <div class="copy">
+        <h1>Escanea y arranca.</h1>
+        <p class="sub">Descarga la App y convierte cualquier mesa en una pista holográfica.</p>
+      </div>
+      <div class="qr-wrap">
+        <img src="qr.png" alt="Código QR hacia www.tuweb.com">
+      </div>
+      <p class="contact">www.tuweb.com | @TuInstagram</p>
+    </article>
+
+    <article class="panel cover">
+      <div class="copy">
+        <h1>La pista es infinita.</h1>
+        <p class="sub">Tu imaginación. Tus carritos. Nuestra tecnología.</p>
+      </div>
+    </article>
+
+    <article class="panel flap">
+      <p class="flap-name">Phygital Racing Pack</p>
+    </article>
+  </section>
+
+  <section class="sheet">
+    <article class="panel holo">
+      <div class="copy">
+        <h1>Dibuja. Apunta. Corre.</h1>
+        <ul>
+          <li><span class="icon">F</span><span><strong>Físico:</strong> Traza tu circuito con gis luminoso.</span></li>
+          <li><span class="icon">D</span><span><strong>Digital:</strong> El proyector activa Turbos y Metas.</span></li>
+          <li><span class="icon">T</span><span><strong>Táctico:</strong> 3 Tiros por turno. El VAR decide.</span></li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="panel cover">
+      <p class="center-line">La pista es infinita.</p>
+    </article>
+
+    <article class="panel pack">
+      <div class="copy">
+        <h1>El pack premium.</h1>
+        <ul>
+          <li>Tapete "Playmat" (1x1m) Impermeable.</li>
+          <li>Mini Proyector Smart de Mapeo.</li>
+          <li>2x Marcadores Gis Líquido Neón.</li>
+          <li>Acceso VIP a la App de Arbitraje.</li>
+        </ul>
+      </div>
+    </article>
+  </section>
+</body>
+</html>

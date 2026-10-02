@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
@@ -171,9 +172,82 @@ namespace ARTrackBuilder.Editor
             UnityEventTools.AddVoidPersistentListener(ui.NextRaceButton.onClick, waypoints.SiguienteCarrera);
             UnityEventTools.AddVoidPersistentListener(ui.ModeButton.onClick, display.ToggleMode);
 
-            EditorSceneManager.SaveScene(projectorCamera.scene, SCENE_PATH);
+            if (!TrySaveActiveScene())
+            {
+                EditorApplication.delayCall += RetrySaveWhenIdle;
+                return;
+            }
+
+            FinishSceneSave();
+        }
+
+        private static string SceneAbsolutePath()
+        {
+            return Path.Combine(Application.dataPath, "Scenes", "SampleScene.unity");
+        }
+
+        private static bool TrySaveActiveScene()
+        {
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+            {
+                return false;
+            }
+
+            Scene active = EditorSceneManager.GetActiveScene();
+            if (!active.IsValid() || !active.isLoaded)
+            {
+                Debug.LogError("[AR] La escena activa no está lista para guardarse.");
+                return false;
+            }
+
+            bool saved = EditorSceneManager.SaveScene(active, SCENE_PATH);
+            return saved && File.Exists(SceneAbsolutePath());
+        }
+
+        private static int _saveRetries;
+
+        private static void RetrySaveWhenIdle()
+        {
+            if (File.Exists(SceneAbsolutePath()))
+            {
+                FinishSceneSave();
+                return;
+            }
+
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+            {
+                _saveRetries++;
+                if (_saveRetries < 40)
+                {
+                    EditorApplication.delayCall += RetrySaveWhenIdle;
+                }
+                else
+                {
+                    Debug.LogError("[AR] La escena sigue sin guardarse: el editor no termina de importar.");
+                }
+
+                return;
+            }
+
+            if (TrySaveActiveScene())
+            {
+                FinishSceneSave();
+                return;
+            }
+
+            Scene active = EditorSceneManager.GetActiveScene();
+            Debug.LogError(
+                "[AR] No se pudo guardar " + SCENE_PATH
+                + ". valida=" + active.IsValid()
+                + " cargada=" + active.isLoaded
+                + " ruta=" + active.path);
+        }
+
+        private static void FinishSceneSave()
+        {
             AddSceneToBuildSettings();
             AssetDatabase.SaveAssets();
+            AssetDatabase.ImportAsset(SCENE_PATH);
             Debug.Log("[AR] Escena de prueba lista en " + SCENE_PATH + ". Pulsa Play.");
         }
 
@@ -285,28 +359,62 @@ namespace ARTrackBuilder.Editor
 
         private static void CreateDashboard(Transform canvas, Font font, Sprite sprite, LocalUi ui)
         {
-            ui.DashboardPanel = CreatePanel(canvas, "Panel_Dashboard", sprite, new Color(0.05f, 0.07f, 0.1f, 0.88f), new Vector2(-680f, 70f), new Vector2(500f, 700f));
-            ui.CurrentPlayerText = CreateText(ui.DashboardPanel.transform, "Text_CurrentPlayer", "TURNO DE: JUGADOR 1", font, 26, TextAnchor.MiddleCenter, new Vector2(0f, 290f), new Vector2(460f, 48f));
-            ui.NextPlayerText = CreateText(ui.DashboardPanel.transform, "Text_NextPlayer", "SIGUIENTE: Jugador 2", font, 20, TextAnchor.MiddleCenter, new Vector2(0f, 240f), new Vector2(460f, 36f));
+            ui.DashboardPanel = CreatePanel(canvas, "Panel_Dashboard", sprite, new Color(0.102f, 0.102f, 0.102f, 1f), Vector2.zero, new Vector2(500f, 700f));
+            RectTransform dashboardRect = ui.DashboardPanel.GetComponent<RectTransform>();
+            dashboardRect.anchorMin = Vector2.zero;
+            dashboardRect.anchorMax = new Vector2(0.3f, 1f);
+            dashboardRect.offsetMin = Vector2.zero;
+            dashboardRect.offsetMax = Vector2.zero;
+            dashboardRect.pivot = new Vector2(0f, 0.5f);
+            VerticalLayoutGroup column = ui.DashboardPanel.AddComponent<VerticalLayoutGroup>();
+            column.childAlignment = TextAnchor.UpperCenter;
+            column.spacing = 30f;
+            column.padding = new RectOffset(20, 20, 20, 20);
+            column.childControlWidth = true;
+            column.childControlHeight = true;
+            column.childForceExpandWidth = true;
+            column.childForceExpandHeight = false;
+
+            ui.CurrentPlayerText = CreateText(ui.DashboardPanel.transform, "Text_CurrentPlayer", "TURNO DE: JUGADOR 1", font, 36, TextAnchor.MiddleCenter, Vector2.zero, new Vector2(460f, 56f));
+            ui.CurrentPlayerText.gameObject.AddComponent<LayoutElement>().preferredHeight = 56f;
+            ui.NextPlayerText = CreateText(ui.DashboardPanel.transform, "Text_NextPlayer", "SIGUIENTE: Jugador 2", font, 30, TextAnchor.MiddleCenter, Vector2.zero, new Vector2(460f, 48f));
             ui.NextPlayerText.color = new Color(0.75f, 0.85f, 0.95f, 1f);
+            ui.NextPlayerText.gameObject.AddComponent<LayoutElement>().preferredHeight = 48f;
+
+            GameObject shotRow = new GameObject("ShotCards", typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(LayoutElement));
+            shotRow.transform.SetParent(ui.DashboardPanel.transform, false);
+            HorizontalLayoutGroup row = shotRow.GetComponent<HorizontalLayoutGroup>();
+            row.childAlignment = TextAnchor.MiddleCenter;
+            row.spacing = 16f;
+            row.childControlWidth = true;
+            row.childControlHeight = true;
+            row.childForceExpandWidth = true;
+            row.childForceExpandHeight = false;
+            shotRow.GetComponent<LayoutElement>().preferredHeight = 150f;
 
             ui.ShotCardBackgrounds = new Image[3];
             ui.ShotCardStatusTexts = new Text[3];
             for (int i = 0; i < 3; i++)
             {
-                GameObject card = CreatePanel(ui.DashboardPanel.transform, "Card_Tiro" + (i + 1), sprite, Color.white, new Vector2(-155f + (i * 155f), 130f), new Vector2(140f, 130f));
-                Text title = CreateText(card.transform, "Title", "TIRO " + (i + 1), font, 18, TextAnchor.UpperCenter, new Vector2(0f, 40f), new Vector2(120f, 32f));
+                GameObject card = CreatePanel(shotRow.transform, "Card_Tiro" + (i + 1), sprite, Color.white, Vector2.zero, new Vector2(140f, 140f));
+                card.AddComponent<LayoutElement>().preferredHeight = 140f;
+                Text title = CreateText(card.transform, "Title", "TIRO " + (i + 1), font, 30, TextAnchor.UpperCenter, new Vector2(0f, 24f), new Vector2(120f, 40f));
                 title.color = new Color(0.15f, 0.15f, 0.15f, 1f);
-                Text status = CreateText(card.transform, "Status", i == 0 ? "EN CURSO" : "PENDIENTE", font, 16, TextAnchor.MiddleCenter, new Vector2(0f, -16f), new Vector2(120f, 36f));
+                Text status = CreateText(card.transform, "Status", i == 0 ? "EN CURSO" : "PENDIENTE", font, 24, TextAnchor.MiddleCenter, new Vector2(0f, -20f), new Vector2(120f, 40f));
                 status.color = new Color(0.1f, 0.1f, 0.1f, 1f);
                 ui.ShotCardBackgrounds[i] = card.GetComponent<Image>();
                 ui.ShotCardStatusTexts[i] = status;
             }
 
-            ui.RegisterShotButton = CreateButton(ui.DashboardPanel.transform, "Button_YaTire", "¡YA TIRÉ! (TIRO 1 DE 3)", font, sprite, new Vector2(0f, 150f), new Vector2(440f, 72f), out ui.ActionButtonText);
+            ui.RegisterShotButton = CreateButton(ui.DashboardPanel.transform, "Button_YaTire", "¡YA TIRÉ! (TIRO 1 DE 3)", font, sprite, Vector2.zero, new Vector2(440f, 80f), out ui.ActionButtonText);
             ui.RegisterShotButton.GetComponent<Image>().color = new Color(0.15f, 0.45f, 0.95f, 1f);
-            ui.EndTurnButton = CreateButton(ui.DashboardPanel.transform, "Button_TerminarTurno", "TERMINAR TURNO (2 TIROS)", font, sprite, new Vector2(0f, 80f), new Vector2(440f, 52f), out _);
-            ui.TurnHistoryText = CreateText(ui.DashboardPanel.transform, "Text_TurnHistory", "Historial", font, 18, TextAnchor.UpperLeft, new Vector2(0f, -30f), new Vector2(440f, 150f));
+            ui.RegisterShotButton.gameObject.AddComponent<LayoutElement>().preferredHeight = 80f;
+            ui.ActionButtonText.fontSize = 32;
+            ui.EndTurnButton = CreateButton(ui.DashboardPanel.transform, "Button_TerminarTurno", "TERMINAR TURNO (2 TIROS)", font, sprite, Vector2.zero, new Vector2(440f, 64f), out Text endTurnLabel);
+            ui.EndTurnButton.gameObject.AddComponent<LayoutElement>().preferredHeight = 64f;
+            endTurnLabel.fontSize = 30;
+            ui.TurnHistoryText = CreateText(ui.DashboardPanel.transform, "Text_TurnHistory", "Historial", font, 30, TextAnchor.UpperLeft, Vector2.zero, new Vector2(440f, 180f));
+            ui.TurnHistoryText.gameObject.AddComponent<LayoutElement>().flexibleHeight = 1f;
             ui.TrackNameText = CreateText(canvas, "Text_TrackName", "Sin pista", font, 22, TextAnchor.MiddleCenter, new Vector2(500f, 300f), new Vector2(340f, 48f));
             ui.NextRaceButton = CreateButton(canvas, "Button_SiguienteCarrera", "SIGUIENTE CARRERA", font, sprite, new Vector2(480f, 360f), new Vector2(340f, 64f), out _);
             ui.RuleButtonRoot = new GameObject("RuleButtons", typeof(RectTransform), typeof(VerticalLayoutGroup));
@@ -715,8 +823,6 @@ namespace ARTrackBuilder.Editor
     [InitializeOnLoad]
     internal static class LocalTestSceneAutoBuilder
     {
-        private const string SESSION_KEY = "ARTrackBuilder.LocalSceneAttempted";
-
         static LocalTestSceneAutoBuilder()
         {
             EditorApplication.delayCall += TryBuild;
@@ -730,12 +836,11 @@ namespace ARTrackBuilder.Editor
                 return;
             }
 
-            if (SessionState.GetBool(SESSION_KEY, false))
+            if (File.Exists(Path.Combine(Application.dataPath, "Scenes", "SampleScene.unity")))
             {
                 return;
             }
 
-            SessionState.SetBool(SESSION_KEY, true);
             LocalTestSceneBuilder.BuildIfMissing();
         }
     }

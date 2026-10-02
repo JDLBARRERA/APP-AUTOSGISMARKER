@@ -71,9 +71,9 @@ Tres formatos. El nombre en pantalla es el de la izquierda; el enum interno sigu
 
 | Formato | Vueltas | Qué lleva la pista |
 | --- | --- | --- |
-| CIRCUITO | 1 | Un exacto, una trampa, un foso, un tiro largo y hielo |
-| GRAN CIRCUITO | 2 | Dos exactos, trampa, foso, tiro largo y lava |
-| GRAND PRIX | 3 | Dos exactos, trampas de 1, 2 y 3 tiros, dos fosos, dos tiros largos, lava y hielo |
+| CIRCUITO | 1 | Un exacto, una trampa de 1 tiro, un foso, un tiro largo, hielo y lluvia |
+| GRAN CIRCUITO | 2 | Dos exactos, una trampa de 2 tiros, un foso, un tiro largo, lava y lluvia |
+| GRAND PRIX | 3 | Dos exactos, trampas de 1, 2 y 3 tiros, dos fosos, dos tiros largos, lava, hielo y lluvia |
 
 Módulos, en este orden: Óvalo, Ocho, Recta, Manzanas, Campeonato. Cada uno tiene 10 carreras. **SIGUIENTE CARRERA** avanza dentro del módulo y, al terminar, pasa al siguiente de la misma dificultad.
 
@@ -87,6 +87,7 @@ Reglas que el tablero aplica a mano, porque la app no ve el carrito:
 - El foso es zona prohibida: se pierde el turno siguiente.
 - La trampa de tensión (1, 2 o 3 tiros) es otra regla. Si se falla, el auto vuelve al inicio de esa sección.
 - Lava o hielo: el siguiente turno se tira con la mano no dominante.
+- Lluvia: si el auto está en ese tramo, el turno queda en un tiro. El siguiente vuelve a tres, salvo que se marque otra vez.
 - Tráfico gasta un tiro. El takedown quita el primer tiro del rival.
 
 **¡YA TIRÉ!** avanza el tiro. Al completar el límite cambia el jugador. **PASAR TURNO** cierra antes. Los botones de la derecha solo aparecen si esa pista tiene la zona.

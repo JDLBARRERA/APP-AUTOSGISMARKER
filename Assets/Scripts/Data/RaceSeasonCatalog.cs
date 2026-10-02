@@ -4,8 +4,8 @@ namespace ARTrackBuilder.Data
 {
     /// <summary>
     /// 150 pistas: 3 dificultades, 5 módulos y 10 carreras.
-    /// Cada una incluye meta, tiro exacto, foso, tiro largo, trampa, lava y hielo,
-    /// separados para que se recorran en orden alrededor de la vuelta.
+    /// Cada formato coloca solo las zonas de su reglamento, más un tramo de lluvia.
+    /// Quedan separadas para recorrerse en orden alrededor de la vuelta.
     /// </summary>
     public static class RaceSeasonCatalog
     {
@@ -32,6 +32,7 @@ namespace ARTrackBuilder.Data
             public float Long;
             public float Ice;
             public float Lava;
+            public float Rain;
             public float Exact2;
             public float Pit2;
             public float Long2;
@@ -67,7 +68,7 @@ namespace ARTrackBuilder.Data
                 points[i] = TrackWaypoint.At(raw[i], WaypointRule.Path);
             }
 
-            PlaceRules(points, format, raceIndex, PlanFor(moduleIndex));
+            PlaceRules(points, format, PlanFor(moduleIndex));
 
             string formatName = format == RaceFormat.Medium ? "GRAN CIRCUITO" : format == RaceFormat.GrandPrix ? "GRAND PRIX" : "CIRCUITO";
             string moduleName = ModuleNames[moduleIndex];
@@ -91,37 +92,37 @@ namespace ARTrackBuilder.Data
                 case 1:
                     return new RulePlan
                     {
-                        Exact = 0.10f, Tension = 0.18f, Pit = 0.40f, Long = 0.50f, Ice = 0.62f, Lava = 0.88f,
+                        Exact = 0.10f, Tension = 0.18f, Pit = 0.40f, Long = 0.50f, Ice = 0.62f, Lava = 0.88f, Rain = 0.54f,
                         Exact2 = 0.15f, Pit2 = 0.42f, Long2 = 0.58f, Tension2 = 0.36f, Tension3 = 0.68f
                     };
                 case 2:
                     return new RulePlan
                     {
-                        Exact = 0.06f, Tension = 0.76f, Pit = 0.88f, Long = 0.22f, Ice = 0.63f, Lava = 0.38f,
+                        Exact = 0.06f, Tension = 0.76f, Pit = 0.88f, Long = 0.22f, Ice = 0.63f, Lava = 0.38f, Rain = 0.48f,
                         Exact2 = 0.12f, Pit2 = 0.48f, Long2 = 0.18f, Tension2 = 0.32f, Tension3 = 0.70f
                     };
                 case 3:
                     return new RulePlan
                     {
-                        Exact = 0.22f, Tension = 0.74f, Pit = 0.86f, Long = 0.10f, Ice = 0.59f, Lava = 0.34f,
+                        Exact = 0.22f, Tension = 0.74f, Pit = 0.86f, Long = 0.10f, Ice = 0.59f, Lava = 0.34f, Rain = 0.46f,
                         Exact2 = 0.16f, Pit2 = 0.42f, Long2 = 0.68f, Tension2 = 0.28f, Tension3 = 0.52f
                     };
                 case 4:
                     return new RulePlan
                     {
-                        Exact = 0.05f, Tension = 0.56f, Pit = 0.63f, Long = 0.20f, Ice = 0.82f, Lava = 0.38f,
+                        Exact = 0.05f, Tension = 0.56f, Pit = 0.63f, Long = 0.20f, Ice = 0.82f, Lava = 0.38f, Rain = 0.48f,
                         Exact2 = 0.12f, Pit2 = 0.88f, Long2 = 0.16f, Tension2 = 0.30f, Tension3 = 0.74f
                     };
                 default:
                     return new RulePlan
                     {
-                        Exact = 0.16f, Tension = 0.34f, Pit = 0.50f, Long = 0.66f, Ice = 0.80f, Lava = 0.92f,
+                        Exact = 0.16f, Tension = 0.34f, Pit = 0.50f, Long = 0.66f, Ice = 0.80f, Lava = 0.92f, Rain = 0.08f,
                         Exact2 = 0.28f, Pit2 = 0.42f, Long2 = 0.74f, Tension2 = 0.22f, Tension3 = 0.58f
                     };
             }
         }
 
-        private static void PlaceRules(TrackWaypoint[] points, RaceFormat format, int race, RulePlan plan)
+        private static void PlaceRules(TrackWaypoint[] points, RaceFormat format, RulePlan plan)
         {
             bool[] used = new bool[points.Length];
             used[0] = true;
@@ -130,6 +131,7 @@ namespace ARTrackBuilder.Data
             Place(points, used, plan.Long, WaypointRule.LongShot, 0, true);
             Place(points, used, plan.Exact, WaypointRule.ExactShot, 0, false);
             Place(points, used, plan.Pit, WaypointRule.Pit, 0, true);
+            Place(points, used, plan.Rain, WaypointRule.Rain, 0, true);
             if (format == RaceFormat.GrandPrix)
             {
                 Place(points, used, plan.Tension, WaypointRule.TensionTrap, 1, true);
@@ -138,18 +140,20 @@ namespace ARTrackBuilder.Data
                 Place(points, used, plan.Exact2, WaypointRule.ExactShot, 0, false);
                 Place(points, used, plan.Pit2, WaypointRule.Pit, 0, true);
                 Place(points, used, plan.Long2, WaypointRule.LongShot, 0, true);
+                Place(points, used, plan.Ice, WaypointRule.Ice, 0, true);
+                Place(points, used, plan.Lava, WaypointRule.Lava, 0, true);
+            }
+            else if (format == RaceFormat.Medium)
+            {
+                Place(points, used, plan.Tension, WaypointRule.TensionTrap, 2, true);
+                Place(points, used, plan.Exact2, WaypointRule.ExactShot, 0, false);
+                Place(points, used, plan.Lava, WaypointRule.Lava, 0, true);
             }
             else
             {
-                Place(points, used, plan.Tension, WaypointRule.TensionTrap, (race % 3) + 1, true);
-                if (format == RaceFormat.Medium)
-                {
-                    Place(points, used, plan.Exact2, WaypointRule.ExactShot, 0, false);
-                }
+                Place(points, used, plan.Tension, WaypointRule.TensionTrap, 1, true);
+                Place(points, used, plan.Ice, WaypointRule.Ice, 0, true);
             }
-
-            Place(points, used, plan.Ice, WaypointRule.Ice, 0, true);
-            Place(points, used, plan.Lava, WaypointRule.Lava, 0, true);
         }
 
         private static void Place(TrackWaypoint[] points, bool[] used, float fraction, WaypointRule rule, int value, bool avoidCenter)
