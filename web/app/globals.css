@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+:root {
+  --background: #030712;
+  --foreground: #f8fafc;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.zone-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #39f3ff #071018;
+}
+
+.zone-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.zone-scroll::-webkit-scrollbar-track {
+  background: #071018;
+  border-radius: 999px;
+}
+
+.zone-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(#67fff6, #39f3ff);
+  border-radius: 999px;
+  box-shadow: 0 0 8px #39f3ff;
+}

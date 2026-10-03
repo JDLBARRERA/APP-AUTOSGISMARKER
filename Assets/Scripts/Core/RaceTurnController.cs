@@ -64,6 +64,29 @@ namespace ARTrackBuilder.Core
         }
 
         /// <summary>
+        /// El árbitro da un tiro extra en este turno.
+        /// En el primer tiro sube el límite. Si el conteo ya avanzó, retrocede uno.
+        /// </summary>
+        public void GrantTurboShot()
+        {
+            if (CurrentShot < 1)
+            {
+                return;
+            }
+
+            if (CurrentShot == 1)
+            {
+                _shotLimit += 1;
+            }
+            else
+            {
+                CurrentShot -= 1;
+            }
+
+            OnShotChanged?.Invoke(CurrentShot);
+        }
+
+        /// <summary>
         /// El auto quedó en un tiro largo: el siguiente turno tiene 4 tiros.
         /// </summary>
         public void GrantLongShot()

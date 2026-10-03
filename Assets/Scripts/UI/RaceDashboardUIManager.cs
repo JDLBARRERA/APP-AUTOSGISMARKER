@@ -36,6 +36,7 @@ namespace ARTrackBuilder.UI
         {
             if (ActionButton) ActionButton.onClick.AddListener(OnShotClicked);
             if (PassTurnButton) PassTurnButton.onClick.AddListener(OnPassClicked);
+            BindShotCards(true);
             if (RaceTurnController.Instance)
             {
                 RaceTurnController.Instance.OnShotChanged += UpdateUI;
@@ -49,6 +50,7 @@ namespace ARTrackBuilder.UI
         {
             if (ActionButton) ActionButton.onClick.RemoveListener(OnShotClicked);
             if (PassTurnButton) PassTurnButton.onClick.RemoveListener(OnPassClicked);
+            BindShotCards(false);
             if (RaceTurnController.Instance)
             {
                 RaceTurnController.Instance.OnShotChanged -= UpdateUI;
@@ -68,10 +70,49 @@ namespace ARTrackBuilder.UI
                 _throwOrder.SetGrid(new[] { "Jugador 1", "Jugador 2" });
             }
 
+            if (RaceTurnController.Instance != null)
+            {
+                RaceTurnController.Instance.OnShotChanged -= UpdateUI;
+                RaceTurnController.Instance.OnShotChanged += UpdateUI;
+                RaceTurnController.Instance.OnRuleAlertTriggered -= OnAlert;
+                RaceTurnController.Instance.OnRuleAlertTriggered += OnAlert;
+            }
+
             BindProjection();
             int shot = RaceTurnController.Instance != null ? RaceTurnController.Instance.CurrentShot : 1;
             UpdateUI(shot);
             RefreshRules();
+        }
+
+        private void BindShotCards(bool listen)
+        {
+            if (ShotCards == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < ShotCards.Length; i++)
+            {
+                Image card = ShotCards[i];
+                if (card == null)
+                {
+                    continue;
+                }
+
+                Button button = card.GetComponent<Button>();
+                if (button == null)
+                {
+                    button = card.gameObject.AddComponent<Button>();
+                }
+
+                button.targetGraphic = card;
+                button.transition = Selectable.Transition.None;
+                button.onClick.RemoveListener(OnShotClicked);
+                if (listen)
+                {
+                    button.onClick.AddListener(OnShotClicked);
+                }
+            }
         }
 
         /// <summary>
@@ -122,9 +163,46 @@ namespace ARTrackBuilder.UI
         public void OnPassClicked()
         {
             if (HistoryText) HistoryText.text += $"\n• {GetCurrentPlayer()}: terminó el turno antes de tiempo.";
-            ShiftPlayer();
-            if (RaceTurnController.Instance) RaceTurnController.Instance.ResetTurn();
-            else UpdateUI(1);
+            AdvancePlayer();
+        }
+
+        /// <summary>
+        /// El árbitro otorga un tiro extra. Vale desde el primer tiro del turno.
+        /// </summary>
+        public void ApplyTurbo()
+        {
+            OnAlert("🔥 ¡TURBO! +1 Tiro extra.");
+            if (RaceTurnController.Instance == null || RaceTurnController.Instance.CurrentShot < 1)
+            {
+                return;
+            }
+
+            RaceTurnController.Instance.GrantTurboShot();
+        }
+
+        /// <summary>
+        /// El árbitro cierra el turno por trampa y pasa al siguiente piloto.
+        /// </summary>
+        public void ApplyTrap()
+        {
+            OnAlert("🧊 ¡TRAMPA! Turno finalizado.");
+            AdvancePlayer();
+        }
+
+        /// <summary>
+        /// El árbitro confirma que el tiro quedó en la zona exacta.
+        /// </summary>
+        public void ApplyExactShot()
+        {
+            OnAlert("🎯 ¡TIRO EXACTO! Movimiento perfecto.");
+        }
+
+        /// <summary>
+        /// El árbitro marca un choque y deja la posición penalizada.
+        /// </summary>
+        public void ApplyCrash()
+        {
+            OnAlert("💥 ¡CHOQUE! Posición penalizada.");
         }
 
         private void UpdateUI(int currentShot)
@@ -188,6 +266,13 @@ namespace ARTrackBuilder.UI
             }
 
             ShotCardTexts[index].text = status;
+        }
+
+        private void AdvancePlayer()
+        {
+            ShiftPlayer();
+            if (RaceTurnController.Instance) RaceTurnController.Instance.ResetTurn();
+            else UpdateUI(1);
         }
 
         private void ShiftPlayer()

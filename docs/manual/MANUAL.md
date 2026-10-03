@@ -60,6 +60,8 @@ Si un tiro se sale por completo y ya no toca la línea, ese tiro no avanza. El c
 
 Solo se marcan las zonas que esa carrera trae. El botón sale cuando la pista las tiene. Si la carrera no trae esa zona, esa regla no se usa.
 
+**Turbo.** Si el carrito se detiene en la casilla verde, gana un tiro extra en ese mismo turno. Se tira de inmediato. En la app, **TURBO** suma ese tiro.
+
 **Tiro exacto.** El carrito se detiene en la casilla amarilla y ahí se queda. Si todavía te quedan tiros, puedes seguir desde ese punto. No te regresan ni te castigan: solo clavaste la casilla.
 
 **Tiro largo.** Si el turno se acaba sobre la flecha verde, el siguiente turno de ese jugador trae cuatro tiros, no tres. Es un premio por quedarte en la flecha.
@@ -120,6 +122,9 @@ El récord queda guardado en esa pista. El resultado de la sesión también.
 | El dedo, el auto y si salió de la línea | El conteo de tiros y el cambio de jugador |
 | Quién va delante de verdad | **VA PRIMERO**, para que el siguiente ciclo lo respete |
 | Caer en el foso, la lava, el hielo o la lluvia | El castigo de esa zona |
+| Parar en el turbo | **TURBO** suma un tiro en ese mismo turno |
+| Quedarse en la flecha verde | **TIRO LARGO** deja 4 tiros en el turno que sigue |
+| Pegarse, sacar al rival o ir en el rebufo | **TRÁFICO**, **TAKEDOWN** o **REBUFO** |
 | El paso por meta en el slot | El cronómetro y la clasificación |
 
 Si la luz y la mesa no coinciden, se mira el auto. La app anota lo que ustedes confirman.

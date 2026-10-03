@@ -16,6 +16,7 @@ Tocar la orilla no saca al carrito. Cada tiro que se queda lo deja ahí, y de ah
 
 Solo valen las que estén dibujadas.
 
+- **Turbo.** Si se detiene en la casilla verde, gana un tiro extra en ese mismo turno.
 - **Exacto.** Se detiene en la casilla, se queda y, si le quedan tiros, sigue.
 - **Tiro largo.** Si el turno acaba en la flecha, el siguiente trae cuatro tiros.
 - **Trampa.** Se cruza en uno, dos o tres tiros. Si se queda adentro, regresa al inicio de esa sección. No es un foso.

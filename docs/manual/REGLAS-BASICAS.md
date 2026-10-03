@@ -38,6 +38,8 @@ Las zonas se dibujan en la pista. Solo valen las que esa carrera traiga marcadas
 
 ![El foso corta la línea](foso.jpg)
 
+**Turbo.** Si el carrito se detiene en la casilla verde, ese mismo turno gana un tiro de más. Se tira enseguida. No se guarda para después.
+
 **Tiro exacto.** El carrito se detiene en la casilla y ahí se queda. Si todavía le quedan tiros, puede seguir desde ese punto. No es castigo: clavó la casilla.
 
 **Tiro largo.** Si el turno se acaba sobre la flecha, el siguiente turno de ese jugador trae cuatro tiros, no tres.
